@@ -27,8 +27,6 @@
     }
     video {
       position: fixed;
-      bottom: 16px;
-      right: 16px;
       width: 160px;
       border-radius: 8px;
     }
@@ -39,6 +37,15 @@
     <h1>LeppIT OÜ</h1>
     <p>Site coming soon.</p>
   </main>
-  <video src="burn.mp4" autoplay loop muted playsinline></video>
+  <video src="burn.mp4" autoplay loop muted playsinline width="160"></video>
+  <script>
+    const video = document.querySelector("video");
+    const w = 160;
+    const h = w * (video.videoHeight / video.videoWidth || 9 / 16);
+    const maxX = Math.max(0, window.innerWidth - w);
+    const maxY = Math.max(0, window.innerHeight - h);
+    video.style.left = Math.random() * maxX + "px";
+    video.style.top = Math.random() * maxY + "px";
+  </script>
 </body>
 </html>
