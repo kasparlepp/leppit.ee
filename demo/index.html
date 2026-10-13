@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>NOVA Ensemble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #04122d;
+    --green: #00ffb9;
+    --indigo: #5b5bd8;
+    --serif: 'Libre Baskerville', Baskerville, Georgia, serif;
+    --sans: 'General Sans', Arial, Helvetica, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    position: relative;
+    overflow-x: hidden;
+    background: var(--navy);
+    color: var(--green);
+    font: 400 16px/21px var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; width: 100%; height: auto; object-fit: cover; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .skip { position: absolute; left: -9999px; top: 0; }
+  .skip:focus { left: 1rem; z-index: 200; background: var(--green); color: var(--navy); padding: .5rem 1rem; }
+
+  .container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 1.25rem; }
+  @media (min-width: 1024px) { .container { padding: 0 2.5rem; } }
+
+  /* Type scale (from the original theme) */
+  .serif { font-family: var(--serif); font-weight: 400; }
+  .h1 { font-size: 40px; line-height: 40px; font-weight: 600; }
+  .h2 { font-size: 40px; line-height: 40px; }
+  .h3 { font-size: 26px; line-height: 26px; }
+  .sm { font-size: 12px; line-height: 130%; text-transform: uppercase; font-weight: 600; letter-spacing: .02em; }
+  @media (min-width: 1024px) {
+    .h1 { font-size: 100px; line-height: 95px; }
+    .h2 { font-size: 70px; line-height: 65px; }
+    .h3 { font-size: 40px; line-height: 40px; }
+  }
+
+  /* Buttons */
+  .button {
+    display: inline-block; width: fit-content;
+    border: 1px solid var(--green); padding: 8px 12px;
+    font-size: 13px; font-weight: 700; line-height: 1;
+    transition: all 350ms cubic-bezier(.4,0,.2,1);
+  }
+  .button:hover { background: var(--green); color: var(--navy); }
+  .button-arrow::after { content: " →"; }
+
+  /* ---------- Parallax background ---------- */
+  .bg-wrap { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+  .parallax-background { height: 200%; width: 100%; background-repeat: repeat-y; background-size: 100% auto; will-change: transform; }
+
+  /* ---------- Header ---------- */
+  #header {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    padding: 1rem 0;
+    transition: transform .5s ease, background-color .3s ease;
+  }
+  #header.scrolled { background: var(--navy); }
+  #header.hide { transform: translateY(-8rem); }
+  .header-inner { display: flex; align-items: center; position: relative; }
+  .logo { position: relative; z-index: 101; font: 600 28px/1 var(--sans); letter-spacing: -.02em; }
+  .logo span { font-family: var(--serif); font-style: italic; font-weight: 400; }
+
+  .nav { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+  .nav ul { list-style: none; display: flex; gap: 1rem; }
+  .nav ul a {
+    position: relative; display: block; padding: .75rem 1.25rem; font-weight: 600;
+    transition: color .3s ease;
+  }
+  .nav ul a::after {
+    content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px;
+    background: var(--green); z-index: -1;
+    transition: height .3s ease-in-out;
+  }
+  .nav ul a:hover { color: var(--navy); }
+  .nav ul a:hover::after { height: 100%; }
+  .nav ul a[aria-current="page"] { background: var(--green); color: var(--navy); }
+  .lang { display: flex; gap: .5rem; font-weight: 600; }
+  .lang a { opacity: .6; } .lang a[aria-current] { opacity: 1; }
+
+  .a11y { position: relative; }
+  #a11y-toggle { display: block; opacity: .7; transition: opacity .2s; }
+  #a11y-toggle:hover, #a11y-toggle[aria-pressed="true"] { opacity: 1; }
+  .a11y .tip {
+    pointer-events: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    margin-top: .5rem; white-space: nowrap; font-size: 12px; opacity: 0; transition: opacity .2s;
+  }
+  .a11y:hover .tip { opacity: 1; }
+
+  .patron {
+    position: absolute; top: 80px; right: -1.5rem; width: 100px; z-index: 50;
+    transition: transform .3s ease, opacity .3s ease;
+  }
+  .patron:hover { transform: rotate(-45deg); }
+  .patron.gone { opacity: 0; pointer-events: none; }
+
+  .hamburger { display: none; margin-left: auto; position: relative; z-index: 101; width: 32px; height: 22px; }
+  .hamburger span { position: absolute; left: 0; width: 100%; height: 2px; background: var(--green); transition: transform .3s, opacity .3s; }
+  .hamburger span:nth-child(1) { top: 0; } .hamburger span:nth-child(2) { top: 10px; } .hamburger span:nth-child(3) { top: 20px; }
+  .hamburger.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+
+  @media (max-width: 1023px) {
+    .hamburger { display: block; }
+    .nav {
+      position: fixed; inset: 0; z-index: 100; flex-direction: column; justify-content: center;
+      background: var(--navy) var(--bg-img) center / cover;
+      opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s;
+    }
+    .nav.open { opacity: 1; visibility: visible; }
+    .nav ul { flex-direction: column; text-align: center; font-size: 40px; line-height: 40px; }
+    .nav ul a::after { display: none; }
+    .patron { right: 1rem; width: 80px; }
+  }
+
+  /* ---------- Sections ---------- */
+  main { padding-top: 98px; }
+  section { margin: 8rem 0; }
+  @media (min-width: 1024px) { section { margin: 15rem 0; } }
+  .grid12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
+  .stack { display: grid; gap: 1.25rem; }
+  @media (min-width: 1024px) { .stack { gap: 2.5rem; } }
+  .col-full { grid-column: span 12; }
+  @media (min-width: 1024px) {
+    .lg-2-9 { grid-column: 2 / span 9; }
+    .lg-4-8 { grid-column: 4 / span 8; }
+    .lg-3-7 { grid-column: 3 / span 7; }
+    .lg-4-6 { grid-column: 4 / span 6; }
+  }
+  .prose p + p { margin-top: 1rem; }
+  .prose h3 { font: 600 20px/130% var(--sans); }
+  @media (min-width: 1024px) { .prose { font-size: 20px; line-height: 130%; } .prose h3 { font-size: 26px; } }
+
+  /* Hero video */
+  .hero { margin-top: 5rem; overflow: hidden; }
+  .hero .frame { position: relative; height: 260px; }
+  .hero .video {
+    position: absolute; right: 0; top: 4rem; width: 300px; aspect-ratio: 16/9; z-index: 20;
+    background: #000;
+  }
+  @media (min-width: 1024px) { .hero .frame { height: 820px; } .hero .video { width: 940px; top: 10rem; } }
+  .video img { height: 100%; }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .play {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: linear-gradient(transparent 60%, rgba(4,18,45,.6));
+  }
+  .play i {
+    width: 72px; height: 72px; border: 1px solid var(--green); border-radius: 50%;
+    display: grid; place-items: center; transition: background .3s, color .3s;
+  }
+  .play:hover i { background: var(--green); color: var(--navy); }
+  .play b { position: absolute; left: 1rem; bottom: 1rem; font-weight: 600; }
+
+  /* Gallery */
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: end; }
+  .gallery img { aspect-ratio: 3/2; }
+
+  /* Agenda */
+  .agenda { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; align-items: end; }
+  .agenda .pic { grid-column: span 12; position: relative; aspect-ratio: 2/1; overflow: hidden; }
+  .agenda .pic img { position: absolute; inset: 0; height: 100%; transition: opacity .5s ease; }
+  .agenda .list { grid-column: span 12; display: grid; gap: 2.5rem; }
+  .events { display: grid; gap: 2rem; }
+  .event { display: grid; grid-template-columns: 1fr auto; gap: 1.25rem; align-items: center; }
+  .event .when span { font-weight: 400; display: block; }
+  @media (min-width: 1024px) {
+    .agenda .pic { grid-column: 1 / span 5; aspect-ratio: 4/3; }
+    .agenda .list { grid-column: 7 / span 6; }
+    .events { gap: 3.5rem; }
+    .event .when span { display: inline; }
+  }
+
+  /* Newsletter */
+  .signup { display: flex; }
+  @media (min-width: 1024px) { .signup { margin-top: 2.5rem; } }
+  .signup input {
+    flex: 1; min-width: 0; background: transparent; border: 1px solid var(--green); border-right: 0;
+    color: var(--green); padding: .25rem .5rem; font: 600 14px var(--sans);
+  }
+  .signup input::placeholder { color: var(--green); opacity: .5; }
+  .signup button { background: var(--green); color: var(--navy); }
+  .socials { display: flex; gap: .5rem; }
+  .socials a { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--green); transition: all .3s; }
+  .socials a:hover { background: var(--green); color: var(--navy); }
+  .socials svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* Quote with floating images */
+  .float-section { margin-bottom: 8rem; }
+  .float-section .grid12 { position: relative; }
+  .float-img { display: none; }
+  .float-spacer { height: 0; }
+  @media (min-width: 1024px) {
+    .float-section { margin-bottom: 20rem; }
+    .float-img { display: block; position: absolute; width: 500px; z-index: 10; aspect-ratio: 3/2; }
+    .float-spacer { height: 700px; }
+  }
+
+  /* News: staggered columns */
+  .news { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2.5rem 1.25rem; }
+  .post { grid-column: span 12; display: grid; gap: 1.25rem; align-content: start; }
+  .post img { aspect-ratio: 8/5; }
+  .post .body { display: grid; gap: .5rem; }
+  .post .excerpt { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+  @media (min-width: 1024px) {
+    .news { row-gap: 5rem; }
+    .post { grid-column: span 3; gap: 2.5rem; }
+    .post img { aspect-ratio: 1; }
+    .post:nth-child(2) { margin-top: 15rem; }
+    .post:nth-child(3) { margin-top: -5rem; }
+    .post:nth-child(4) { margin-top: 2.5rem; }
+  }
+  .divider { display: flex; align-items: center; gap: 1.25rem; margin-top: 2rem; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--green); }
+  @media (min-width: 1024px) { .divider { margin-top: 4rem; } }
+
+  /* Full-width video */
+  .video.wide { position: relative; aspect-ratio: 16/9; }
+
+  /* Footer */
+  footer { padding-top: 4rem; }
+  .foot { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.25rem; }
+  .foot > div { grid-column: span 6; display: grid; gap: 1.5rem; align-content: start; }
+  .foot ul { list-style: none; }
+  .foot ul a:hover { text-decoration: underline; }
+  .funders { display: flex; gap: 1rem; }
+  .funders span { width: 56px; height: 56px; border: 1px solid var(--green); display: grid; place-items: center; font-size: 10px; font-weight: 600; text-align: center; }
+  @media (min-width: 1024px) {
+    .foot > div:first-child { grid-column: 9 / span 2; }
+    .foot > div:last-child { grid-column: 11 / span 2; }
+  }
+  .bottom { border-top: 1px solid var(--green); margin-top: 6rem; padding: .75rem 0; }
+  .bottom .container { display: flex; justify-content: space-between; }
+
+  /* ---------- Accessibility mode ---------- */
+  body.a11y .serif { font-family: var(--sans); font-weight: 600; }
+  body.a11y .parallax-background { visibility: hidden; }
+  body.a11y .nav { background-image: none; }
+  body.a11y .post img, body.a11y .float-img { filter: none !important; transform: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Skip to content</a>
+
+<div class="bg-wrap" aria-hidden="true"><div class="parallax-background"></div></div>
+
+<header id="header">
+  <div class="container header-inner">
+    <a href="#" class="logo">NOVA<span>e</span></a>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="#" aria-current="page">Home</a></li>
+        <li><a href="#agenda">Agenda</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#">Discover</a></li>
+        <li><a href="#">Archive</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+      <div class="lang"><a href="#">NL</a><a href="#" aria-current="true">EN</a></div>
+      <div class="a11y">
+        <button id="a11y-toggle" aria-pressed="false" aria-label="Enable accessibility mode">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10.5"/><circle cx="12" cy="6.8" r="1.4" fill="currentColor" stroke="none"/><path d="M6.5 9.5 12 10.8l5.5-1.3M12 10.8v3.6m0 0-2.6 4.6m2.6-4.6 2.6 4.6"/></svg>
+        </button>
+        <span class="tip">Accessibility</span>
+      </div>
+    </nav>
+
+    <a href="#" class="patron" id="patron" aria-label="Become a patron">
+      <svg viewBox="0 0 100 100">
+        <defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
+        <circle cx="50" cy="50" r="49" fill="#00ffb9"/>
+        <text font-family="General Sans, Arial" font-weight="600" font-size="11.5" letter-spacing="1.8" fill="#04122d">
+          <textPath href="#circ">BECOME A PATRON • BECOME A PATRON •</textPath>
+        </text>
+        <path d="M50 38 l3.6 7.4 8.1 1.2 -5.9 5.7 1.4 8.1 -7.2-3.8 -7.2 3.8 1.4-8.1 -5.9-5.7 8.1-1.2z" fill="#04122d"/>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <div class="container"><div class="frame">
+      <div class="video" data-youtube="GFqtvB5KRCA">
+        <img src="https://picsum.photos/seed/nova-hero/1400/788" alt="">
+        <button class="play" aria-label="Play teaser"><i>▶</i><b>NOVA × Light Installation Teaser</b></button>
+      </div>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="container grid12">
+      <h2 class="col-full lg-2-9 serif h2">Dare to listen, dare to discover!</h2>
+    </div>
+  </section>
+
+  <section>
+    <div class="container gallery">
+      <img src="https://picsum.photos/seed/nova-gal/900/600" alt="">
+      <div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container grid12">
+      <div class="col-full lg-4-8 stack">
+        <h2 class="serif h2">‘Fire Songs’ selected for the national theatre festival!</h2>
+        <div class="prose"><p>Great news! Our co-production Fire Songs has been selected by the festival jury as one of the ten most impressive productions of the past season. As part of the selection, it returns to the stage this autumn.</p></div>
+        <a class="button button-arrow" href="#">Read on</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="agenda">
+    <div class="agenda">
+      <div class="pic">
+        <img class="image-replace" src="https://picsum.photos/seed/nova-agenda/800/600" alt="">
+      </div>
+      <div class="list">
+        <h2 class="h1">Upcoming concerts</h2>
+        <div class="events">
+          <div class="event" data-image-replace="https://picsum.photos/seed/nova-ev1/800/600">
+            <div class="stack" style="gap:.5rem">
+              <div class="sm when">Wed 14 Oct ’26 <span>Likeminds, Rotterdam</span></div>
+              <h3 class="serif h3">A Ticket to Elsewhere</h3>
+            </div>
+            <a class="button" href="#">View event</a>
+          </div>
+          <div class="event" data-image-replace="https://picsum.photos/seed/nova-ev2/800/600">
+            <div class="stack" style="gap:.5rem">
+              <div class="sm when">Fri 16 Oct ’26 <span>Bimhuis, Amsterdam</span></div>
+              <h3 class="serif h3">A Ticket to Elsewhere</h3>
+            </div>
+            <a class="button" href="#">View event</a>
+          </div>
+          <div class="event" data-image-replace="https://picsum.photos/seed/nova-ev3/800/600">
+            <div class="stack" style="gap:.5rem">
+              <div class="sm when">Sat 17 Oct ’26 <span>Paleiskerk, The Hague</span></div>
+              <h3 class="serif h3">Day in the Surf</h3>
+            </div>
+            <a class="button" href="#">View event</a>
+          </div>
+        </div>
+        <a class="button button-arrow" href="#">Season schedule</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container grid12">
+      <div class="col-full lg-4-6 stack">
+        <h2 class="serif h2">Sign up for the newsletter</h2>
+        <p>Always up to date with the latest news and newest projects.</p>
+        <form class="signup" id="signup">
+          <input type="email" name="email" placeholder="E-mail address" required aria-label="E-mail address">
+          <button class="button" type="submit">Send!</button>
+        </form>
+        <div class="socials">
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v8h4v-8h3l1-4h-4V8.6c0-.4.3-.6.6-.6z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4zM17.3 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zM12 2c-2.7 0-3 0-4.1.1C4 2.3 2.3 4 2.1 7.9 2 9 2 9.3 2 12s0 3 .1 4.1c.2 3.9 1.9 5.6 5.8 5.8 1.1.1 1.4.1 4.1.1s3 0 4.1-.1c3.9-.2 5.6-1.9 5.8-5.8.1-1.1.1-1.4.1-4.1s0-3-.1-4.1C21.7 4 20 2.3 16.1 2.1 15 2 14.7 2 12 2z" fill-rule="evenodd"/></svg></a>
+          <a href="#" aria-label="Spotify"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.6 14.4a.6.6 0 0 1-.9.2c-2.3-1.4-5.3-1.8-8.8-1a.6.6 0 1 1-.3-1.2c3.8-.9 7.1-.5 9.7 1.1.3.2.4.6.3.9zm1.2-2.7a.8.8 0 0 1-1.1.3c-2.7-1.6-6.7-2.1-9.9-1.1a.8.8 0 1 1-.4-1.5c3.6-1.1 8-.6 11.1 1.3.3.2.4.7.3 1zm.1-2.8C14.7 9 9.4 8.8 6.3 9.7a.9.9 0 1 1-.5-1.8c3.5-1.1 9.4-.9 13 1.3a.9.9 0 0 1-.9 1.7z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15V9l5.8 3-5.8 3z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="float-section" id="about">
+    <div class="container grid12">
+      <div class="col-full lg-3-7 stack">
+        <h2 class="serif h2">‘Dare to listen. Dare to discover.’ This line from the press release did not feel like promotional language. It came to life last night.</h2>
+        <div class="prose">
+          <p>– Arts Magazine –</p>
+          <h3>NOVA tells stories that reflect, challenge, inspire and deepen our understanding of human experience and our environment, through the power of new music.</h3>
+        </div>
+        <a class="button button-arrow" href="#">About NOVA</a>
+      </div>
+      <img class="float-img" style="bottom:-500px;left:850px" src="https://picsum.photos/seed/nova-f1/750/500" alt="">
+      <img class="float-img" style="bottom:-600px;left:100px" src="https://picsum.photos/seed/nova-f2/750/500" alt="">
+      <img class="float-img" style="bottom:-800px;left:-200px" src="https://picsum.photos/seed/nova-f3/750/500" alt="">
+      <img class="float-img" style="bottom:-700px;left:500px" src="https://picsum.photos/seed/nova-f4/750/500" alt="">
+    </div>
+    <div class="float-spacer"></div>
+  </section>
+
+  <section id="news">
+    <div class="container stack" style="row-gap:3.5rem">
+      <h2 class="h1">News</h2>
+      <div class="news">
+        <article class="post">
+          <a href="#"><img src="https://picsum.photos/seed/nova-n1/700/700" alt=""></a>
+          <a href="#" class="body">
+            <div class="sm">Thu 17 Sep ’26</div>
+            <h3 class="serif h3">New album: three works on repetition and freedom</h3>
+            <p class="excerpt">On 18 September we release a new album with three works built from short motifs that return, shift and gradually accumulate, while giving performers room to move.</p>
+          </a>
+          <a href="#" class="button">Read on</a>
+        </article>
+        <article class="post">
+          <a href="#"><img src="https://picsum.photos/seed/nova-n2/700/700" alt=""></a>
+          <a href="#" class="body">
+            <div class="sm">Tue 23 Jun ’26</div>
+            <h3 class="serif h3">Personal stories given a new musical life</h3>
+            <p class="excerpt">What do you still want to say when words are no longer enough? We invited people to share a memory, an experience or a feeling. The response was heartwarming.</p>
+          </a>
+          <a href="#" class="button">Read on</a>
+        </article>
+        <article class="post">
+          <a href="#"><img src="https://picsum.photos/seed/nova-n3/700/700" alt=""></a>
+          <a href="#" class="body">
+            <div class="sm">Mon 1 Jun ’26</div>
+            <h3 class="serif h3">Call for input: We Are The Forest</h3>
+            <p class="excerpt">A new project about trees, and you can be part of it. What is your first thought when you think about a tree?</p>
+          </a>
+          <a href="#" class="button">Read on</a>
+        </article>
+        <article class="post">
+          <a href="#"><img src="https://picsum.photos/seed/nova-n4/700/700" alt=""></a>
+          <a href="#" class="body">
+            <div class="sm">Tue 26 May ’26</div>
+            <h3 class="serif h3">‘Fire Songs’ selected for the national theatre festival</h3>
+            <p class="excerpt">Our co-production has been selected as one of the ten most impressive productions of the past season.</p>
+          </a>
+          <a href="#" class="button">Read on</a>
+        </article>
+      </div>
+      <div class="divider"><a class="button button-arrow" href="#">All news</a></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="video wide" data-youtube="GFqtvB5KRCA">
+        <img src="https://picsum.photos/seed/nova-vid/1400/788" alt="">
+        <button class="play" aria-label="Play video"><i>▶</i><b>Live at the Paleiskerk</b></button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container grid12">
+      <div class="col-full lg-4-8 stack">
+        <h2 class="serif h2">“The playing is superb, music-making of complete commitment that perfectly captures the spirit.”</h2>
+        <div class="prose"><p>– A critic, Music Magazine –</p></div>
+        <a class="button button-arrow" href="#">About NOVA</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container foot">
+    <div>
+      <p class="h3" style="font-weight:600;font-size:26px">Go to:</p>
+      <ul>
+        <li><a href="#">Home</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#">Discover</a></li>
+        <li><a href="#news">News</a></li><li><a href="#">Archive</a></li><li><a href="#about">About</a></li>
+        <li><a href="#">Privacy statement</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="h3" style="font-weight:600;font-size:26px">Funders and partners:</p>
+      <div class="funders"><span>LOGO</span><span>LOGO</span></div>
+    </div>
+  </div>
+  <div class="bottom"><div class="container"><p>© NOVA Ensemble, 2026</p><p>Demo</p></div></div>
+</footer>
+
+<script>
+(() => {
+  const body = document.body;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const desktop = () => innerWidth >= 1024;
+  const isA11y = () => body.classList.contains('a11y');
+
+  // ---- Generated background: grainy indigo blocks with ragged edges (stands in for the original GIF) ----
+  const bgSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='1920' height='6000' viewBox='0 0 1920 6000'>
+    <filter id='rag' x='-10%' y='-10%' width='120%' height='120%'>
+      <feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='4' seed='3'/>
+      <feDisplacementMap in='SourceGraphic' scale='90'/>
+      <feGaussianBlur stdDeviation='2'/>
+    </filter>
+    <filter id='grain'>
+      <feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='8'/>
+      <feColorMatrix values='0 0 0 0 0.36  0 0 0 0 0.36  0 0 0 0 0.85  0 0 0 0.35 0'/>
+      <feComposite in2='SourceGraphic' operator='in'/>
+    </filter>
+    <rect width='1920' height='6000' fill='#04122d'/>
+    <g filter='url(#rag)' fill='#5b5bd8'>
+      <rect x='1300' y='200' width='640' height='1500' opacity='.95'/>
+      <rect x='320' y='300' width='1200' height='1400' fill='#0c1a45' opacity='.9'/>
+      <rect x='-100' y='2300' width='900' height='1100' opacity='.85'/>
+      <rect x='1100' y='3700' width='900' height='800' opacity='.6'/>
+      <rect x='200' y='4900' width='1300' height='700' opacity='.75'/>
+    </g>
+    <rect width='1920' height='6000' fill='#fff' filter='url(#grain)'/>
+  </svg>`;
+  const bgUrl = `url("data:image/svg+xml,${encodeURIComponent(bgSvg)}")`;
+  const parallax = document.querySelector('.parallax-background');
+  parallax.style.backgroundImage = bgUrl;
+  document.documentElement.style.setProperty('--bg-img', bgUrl);
+
+  // ---- Scroll: parallax + hide header on scroll down, show on scroll up ----
+  const header = document.getElementById('header');
+  const patron = document.getElementById('patron');
+  let lastY = scrollY, ticking = false;
+  function onScroll() {
+    const y = scrollY;
+    if (!reduceMotion) parallax.style.transform = `translateY(${y * -0.2}px)`;
+    header.classList.toggle('scrolled', y > 100);
+    patron.classList.toggle('gone', y > 100);
+    if (y > header.offsetHeight * 2 && y > lastY) header.classList.add('hide');
+    else if (y < lastY) header.classList.remove('hide');
+    lastY = y;
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+
+  // ---- Mobile menu ----
+  const burger = document.getElementById('hamburger');
+  const nav = document.getElementById('nav');
+  function setMenu(open) {
+    burger.classList.toggle('active', open);
+    nav.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+    body.style.overflow = open ? 'hidden' : '';
+  }
+  burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+  nav.querySelectorAll('ul a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('resize', () => { if (desktop()) setMenu(false); });
+
+  // ---- Accessibility toggle (remembered per browser) ----
+  const a11yBtn = document.getElementById('a11y-toggle');
+  function applyA11y(on) {
+    body.classList.toggle('a11y', on);
+    a11yBtn.setAttribute('aria-pressed', on);
+    a11yBtn.setAttribute('aria-label', on ? 'Disable accessibility mode' : 'Enable accessibility mode');
+    try { localStorage.setItem('a11y', on ? '1' : '0'); } catch (e) {}
+  }
+  try { applyA11y(localStorage.getItem('a11y') === '1'); } catch (e) {}
+  a11yBtn.addEventListener('click', () => applyA11y(!isA11y()));
+
+  // ---- Agenda: hovering a concert swaps the image (with a crossfade) ----
+  const pic = document.querySelector('.image-replace');
+  const original = pic.src;
+  document.querySelectorAll('[data-image-replace]').forEach(item => {
+    const src = item.dataset.imageReplace;
+    new Image().src = src; // preload
+    item.addEventListener('mouseenter', () => {
+      if (pic.src === src) return;
+      pic.style.opacity = 0;
+      setTimeout(() => { pic.src = src; pic.style.opacity = 1; }, 250);
+    });
+  });
+  document.querySelector('.events').addEventListener('mouseleave', () => {
+    pic.style.opacity = 0;
+    setTimeout(() => { pic.src = original; pic.style.opacity = 1; }, 250);
+  });
+
+  // ---- Click-to-load video ----
+  document.querySelectorAll('[data-youtube]').forEach(v => {
+    v.querySelector('.play').addEventListener('click', () => {
+      v.insertAdjacentHTML('beforeend',
+        `<iframe src="https://www.youtube-nocookie.com/embed/${v.dataset.youtube}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Video"></iframe>`);
+    });
+  });
+
+  // ---- Newsletter (demo only) ----
+  document.getElementById('signup').addEventListener('submit', e => {
+    e.preventDefault();
+    e.target.innerHTML = '<p style="font-weight:600">Thanks! You are on the list.</p>';
+  });
+
+  // ---- Cursor effects (desktop only) ----
+  if (reduceMotion) return;
+
+  // distance from point to the nearest edge of a rect (0 when inside)
+  const edgeDist = (r, x, y) => Math.hypot(
+    Math.max(r.left - x, 0, x - r.right),
+    Math.max(r.top - y, 0, y - r.bottom));
+
+  // News images: slightly blurred, sharpen as the cursor approaches
+  const postImgs = document.querySelectorAll('.post img');
+  const POST_MAX_BLUR = 0.8, POST_MAX_DIST = 300;
+
+  // Floating images: pushed away from the cursor and blurred as it gets close
+  const floatImgs = document.querySelectorAll('.float-img');
+  const FLOAT_MAX_BLUR = 4, FLOAT_RANGE = 200, FLOAT_PUSH = 30;
+  floatImgs.forEach(img => {
+    img.style.transition = 'transform 1.4s cubic-bezier(0.25,0.46,0.45,0.94), filter 1s ease';
+    img.style.willChange = 'transform, filter';
+  });
+
+  function resetBlur() {
+    postImgs.forEach(img => img.style.filter = desktop() && !isA11y() ? `blur(${POST_MAX_BLUR}px)` : '');
+  }
+  resetBlur();
+  a11yBtn.addEventListener('click', resetBlur);
+  addEventListener('resize', resetBlur);
+
+  let mx = 0, my = 0, pending = false;
+  function update() {
+    pending = false;
+    if (!desktop() || isA11y()) return;
+    postImgs.forEach(img => {
+      const d = edgeDist(img.getBoundingClientRect(), mx, my);
+      img.style.filter = `blur(${Math.min(d / POST_MAX_DIST, 1) * POST_MAX_BLUR}px)`;
+    });
+    floatImgs.forEach(img => {
+      const r = img.getBoundingClientRect();
+      const d = edgeDist(r, mx, my);
+      if (d >= FLOAT_RANGE) { img.style.transform = 'translate(0,0)'; img.style.filter = 'blur(0px)'; return; }
+      const t = 1 - d / FLOAT_RANGE, ease = t * t;
+      const vx = r.left + r.width / 2 - mx, vy = r.top + r.height / 2 - my;
+      const len = Math.hypot(vx, vy) || 1;
+      img.style.transform = `translate(${(vx / len * ease * FLOAT_PUSH).toFixed(1)}px, ${(vy / len * ease * FLOAT_PUSH).toFixed(1)}px)`;
+      img.style.filter = `blur(${(t * FLOAT_MAX_BLUR).toFixed(2)}px)`;
+    });
+  }
+  addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    if (!pending) { pending = true; requestAnimationFrame(update); }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
